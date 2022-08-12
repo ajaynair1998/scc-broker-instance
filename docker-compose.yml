@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  scc-broker-01:
+    build: ./scc-broker
+    ports:
+      - "8888:8888"
+    # - "19000-24000:19000-24000"
+
+    command: "npm start"
