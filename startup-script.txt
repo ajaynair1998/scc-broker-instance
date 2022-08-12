@@ -1,0 +1,22 @@
+#!/bin/bash
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+echo BEGIN
+
+sudo yum update -y
+sudo amazon-linux-extras install docker
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+sudo chkconfig docker on
+sudo yum install git -y
+cd home/ec2-user
+mkdir instance-files
+cd instance-files
+git clone https://github.com/ajaynair1998/scc-broker-instance.git
+cd scc-broker-instance
+node startup.js
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+echo 'test' > /home/ec2-user/user-script-output.txt
+sudo chmod 666 /var/run/docker.sock
+sudo service docker start && docker-compose --verbose up --build 
+echo END
